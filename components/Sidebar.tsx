@@ -3,13 +3,15 @@ import {
   CoinsIcon,
   HomeIcon,
   Layers2Icon,
+  MenuIcon,
   ShieldCheckIcon,
 } from "lucide-react";
 import React from "react";
 import Logo from "./Logo";
 import Link from "next/link";
-import { buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { usePathname } from "next/navigation";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 const routes = [
   { label: "Home", href: "", icon: HomeIcon },
   {
@@ -59,5 +61,49 @@ const DesktopSidebar = () => {
     </div>
   );
 };
-
+export const MobileSidebar = () => {
+  const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
+  const activeRoute =
+    routes.find(
+      (route) => route.href.length > 0 && pathname.includes(route.href)
+    ) || routes[0];
+  return (
+    <div className="block border-separate bg-background md:hidden">
+      <nav className="container flex items-center justify-center px-8">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size={"icon"}>
+              <MenuIcon />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            className="w-[400px] sm:w-[540px] space-y-4"
+            side={"left"}>
+            <SheetTitle>
+              <Logo />
+            </SheetTitle>
+            <div className="flex flex-col gap-1">
+              {routes.map((route) => (
+                <Link
+                  href={route.href}
+                  key={route.href}
+                  onClick={() => setOpen((prev) => !prev)}
+                  className={buttonVariants({
+                    variant:
+                      activeRoute?.href === route.href
+                        ? "sidebarActiveItem"
+                        : "sidebarItem",
+                  })}>
+                  <route.icon size={20} />
+                  {route.label}
+                </Link>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </nav>
+    </div>
+  );
+};
 export default DesktopSidebar;
