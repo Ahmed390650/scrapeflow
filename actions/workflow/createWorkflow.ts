@@ -4,7 +4,7 @@ import {
   createWorkflowSchema,
   createWorkflowSchemaType,
 } from "@/lib/validation/workflow";
-import { WorkflowStatus } from "@/types/indes";
+import { WorkflowStatus } from "@/types/appNode";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 

@@ -1,3 +1,4 @@
+"use client";
 import { deleteWorkflow } from "@/actions/workflow/deleteWorkflow";
 import {
   AlertDialog,
@@ -11,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 import { useMutation } from "@tanstack/react-query";
-import React from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 interface Props {
   open: boolean;
@@ -25,7 +26,7 @@ const DeleteWorflowDialog = ({
   workflowName,
   worflowId,
 }: Props) => {
-  const [confirmText, setConfirmText] = React.useState("");
+  const [confirmText, setConfirmText] = useState("");
   const { mutate, isPending } = useMutation({
     mutationFn: deleteWorkflow,
     onError: () => {
@@ -33,8 +34,10 @@ const DeleteWorflowDialog = ({
     },
     onSuccess: () => {
       toast.success("Workflow deleted successfully", { id: "delete-workflow" });
+      setConfirmText("");
     },
   });
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -55,7 +58,9 @@ const DeleteWorflowDialog = ({
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => setConfirmText("")}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={confirmText !== workflowName || isPending}
             onClick={() => {
