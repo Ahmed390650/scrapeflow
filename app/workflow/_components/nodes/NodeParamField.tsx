@@ -5,13 +5,16 @@ import React, { useCallback } from "react";
 import StringParam from "./param/StringParam";
 import { useReactFlow } from "@xyflow/react";
 import { AppNode } from "@/types/workflow";
+import BrowserInstanceParam from "./param/BrowserInstanceParam";
 
 const NodeParamField = ({
   input,
   nodeId,
+  disabled,
 }: {
   input: taskParam;
   nodeId: string;
+  disabled: boolean;
 }) => {
   const { updateNodeData, getNode } = useReactFlow();
   const node = getNode(nodeId) as AppNode;
@@ -32,7 +35,16 @@ const NodeParamField = ({
       return (
         <StringParam
           params={input}
+          disabled={disabled}
           value={value}
+          updateNodeParamValue={updateNodeParamValue}
+        />
+      );
+    case TaskParamType.BROWSER_INSTANCE:
+      return (
+        <BrowserInstanceParam
+          params={input}
+          value=""
           updateNodeParamValue={updateNodeParamValue}
         />
       );

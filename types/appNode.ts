@@ -7,5 +7,6 @@ export enum WorkflowStatus {
 export interface paramProps {
   params: taskParam;
   value: string;
+  disabled?: boolean;
   updateNodeParamValue: (data: string) => void;
 }
