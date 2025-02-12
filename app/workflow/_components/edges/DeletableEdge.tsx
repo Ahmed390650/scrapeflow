@@ -31,7 +31,7 @@ const DeletableEdge = (props: EdgeProps) => {
             onClick={() =>
               setEdges((edgs) => edgs.filter((edg) => edg.id !== props.id))
             }
-            className="text-xs w-5 h-5  border cursor-pointer rounded-full leading-none hover:shadow-lg">
+            className="text-xs w-5 h-5  border cursor-pointer rounded-full leading-none hover:shadow-lg  hover:bg-red-600 hover:text-white">
             x
           </Button>
         </div>

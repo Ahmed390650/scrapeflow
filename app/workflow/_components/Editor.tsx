@@ -14,7 +14,7 @@ const Editor = ({ workflow }: { workflow: Workflow | null }) => {
           subTitle={workflow.name}
           workflowId={workflow.id}
         />
-        <section className="flex h-full overflow-auto">
+        <section className="flex h-full overflow-auto ">
           <TaskMenu />
           <FlowEditor workflow={workflow} />
         </section>

@@ -8,6 +8,7 @@ import {
   Controls,
   Edge,
   getOutgoers,
+  MiniMap,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -116,7 +117,7 @@ const FlowEditor = ({ workflow }: { workflow: Workflow }) => {
     [nodes, edges]
   );
   return (
-    <main className="h-full w-full">
+    <main className="h-full w-full ">
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}
@@ -132,6 +133,7 @@ const FlowEditor = ({ workflow }: { workflow: Workflow }) => {
         isValidConnection={isValidConnection}
         onConnect={onConnect}
         snapToGrid>
+        {/* <MiniMap zoomable pannable /> */}
         <Controls position="top-left" fitViewOptions={fitViewOptions} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
