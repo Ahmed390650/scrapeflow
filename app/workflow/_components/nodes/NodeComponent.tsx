@@ -7,14 +7,12 @@ import { TaskRegistry } from "@/lib/workflow/task/registry";
 import { AppNodeData } from "@/types/workflow";
 import NodeInputs, { NodeInput } from "./NodeInputs";
 import NodeOutputs, { NodeOutput } from "./NodeOutputs";
-import { Badge } from "@/components/ui/badge";
 
 const NodeComponent = memo(({ selected, id, data }: NodeProps) => {
   const nodeData = data as AppNodeData;
   const task = TaskRegistry[nodeData.type];
   return (
     <NodeCard nodeId={id} isSelected={selected}>
-      {process.env.NODE_ENV === "development" && <Badge>{id}</Badge>}
       <NodeHeader taskType={nodeData.type} nodeId={id} />
       <NodeInputs>
         {task.inputs.map((input, i) => (

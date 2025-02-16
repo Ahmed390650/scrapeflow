@@ -26,3 +26,7 @@ export type WorkflowExecutionPlanPhase = {
   phase: number;
   nodes: AppNode[];
 };
+export type AppNodeMissingInputs = {
+  nodeId: string;
+  inputs: string[];
+};

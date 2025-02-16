@@ -1,3 +1,4 @@
+import { WorkflowExecution } from "./../node_modules/.prisma/client/index.d";
 import { Node } from "@xyflow/react";
 import { TaskType } from "./task";
 export interface AppNodeData {
@@ -7,4 +8,20 @@ export interface AppNodeData {
 }
 export interface AppNode extends Node {
   data: AppNodeData;
+}
+export enum WorkflowExecutionStatus {
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+}
+export enum WorkflowExecutionTrigger {
+  MANUAL = "MANUAL",
+}
+export enum ExecutionPhaseStatus {
+  CREATED = "CREATED",
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
 }

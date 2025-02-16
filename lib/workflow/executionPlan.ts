@@ -1,12 +1,21 @@
 import {
+  AppNodeMissingInputs,
   WorkflowExecutionPlan,
   WorkflowExecutionPlanPhase,
 } from "@/types/appNode";
 import { AppNode } from "@/types/workflow";
-import { Edge, getIncomers } from "@xyflow/react";
+import { Edge } from "@xyflow/react";
 import { TaskRegistry } from "./task/registry";
+export enum FlowToExecutionValidationError {
+  "NO_ENTRY_POINT",
+  "INVALID_INPUTS",
+}
 type FlowToExecutionPlanType = {
   executionPlan?: WorkflowExecutionPlan;
+  error?: {
+    type: FlowToExecutionValidationError;
+    invalidInputs?: AppNodeMissingInputs[];
+  };
 };
 export const FlowToExecutionPlan = (
   nodes: AppNode[],
@@ -16,10 +25,21 @@ export const FlowToExecutionPlan = (
     (node) => TaskRegistry[node.data.type].isEntryPoint
   );
   if (!entryPoint) {
-    throw new Error("TODO: handle no entry point");
+    return {
+      error: {
+        type: FlowToExecutionValidationError.NO_ENTRY_POINT,
+      },
+    };
   }
+  const inputsWithErrors: AppNodeMissingInputs[] = [];
   const planned = new Set<string>();
-
+  const invalidInputs = getInvalidInputs(entryPoint, edges, planned);
+  if (invalidInputs.length > 0) {
+    inputsWithErrors.push({
+      nodeId: entryPoint.id,
+      inputs: invalidInputs,
+    });
+  }
   const executionPlan: WorkflowExecutionPlan = [
     {
       phase: 1,
@@ -47,8 +67,10 @@ export const FlowToExecutionPlan = (
           //if all incoming/edges are planned and there are still invalid inputs
           //this means that this node is not needed and can be skipped
           //which means that the workflow is invalid and needs to be fixed
-          console.error("invalid inputs", currentNode.id, invalidInputs);
-          throw new Error("TODO: handle invalid inputs");
+          inputsWithErrors.push({
+            nodeId: currentNode.id,
+            inputs: invalidInputs,
+          });
         } else {
           continue;
         }
@@ -60,6 +82,14 @@ export const FlowToExecutionPlan = (
       planned.add(node.id);
     }
     executionPlan.push(nextPhase);
+  }
+  if (inputsWithErrors.length > 0) {
+    return {
+      error: {
+        type: FlowToExecutionValidationError.INVALID_INPUTS,
+        invalidInputs: inputsWithErrors,
+      },
+    };
   }
   return { executionPlan };
 };
@@ -98,3 +128,15 @@ function getInvalidInputs(node: AppNode, edges: Edge[], planned: Set<string>) {
   }
   return invalidInputs;
 }
+const getIncomers = (node: AppNode, nodes: AppNode[], edges: Edge[]) => {
+  if (!node.id) {
+    return [];
+  }
+  const incomersId = new Set();
+  edges.forEach((edge) => {
+    if (edge.target === node.id) {
+      incomersId.add(edge.source);
+    }
+  });
+  return nodes.filter((n) => incomersId.has(n.id));
+};
