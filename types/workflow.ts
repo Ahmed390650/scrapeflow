@@ -1,4 +1,3 @@
-import { WorkflowExecution } from "./../node_modules/.prisma/client/index.d";
 import { Node } from "@xyflow/react";
 import { TaskType } from "./task";
 export interface AppNodeData {

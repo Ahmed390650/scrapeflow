@@ -1,5 +1,4 @@
 "use client";
-
 import { GetWorkflowExecutionWithPhases } from "@/actions/workflow/GetWorkflowExecutionWithPhases";
 import GetWorkflowPhasesDetails from "@/actions/workflow/GetWorkflowPhasesDetails";
 import { Badge } from "@/components/ui/badge";
@@ -101,6 +100,7 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
                 <Badge variant={"outline"}>{index + 1}</Badge>
                 <p className="font-semibold">{phase.name}</p>
               </div>
+              <span className="text-muted-foreground">{phase.status}</span>
             </Button>
           ))}
         </div>
