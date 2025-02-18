@@ -15,6 +15,13 @@ const GetWorkflowPhasesDetails = async (phaseId: string) => {
         userId,
       },
     },
+    include: {
+      logs: {
+        orderBy: {
+          timestamp: "asc",
+        },
+      },
+    },
   });
 };
 

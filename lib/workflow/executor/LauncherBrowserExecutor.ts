@@ -7,15 +7,19 @@ export const LauncherBrowserExecutor = async (
 ): Promise<boolean> => {
   try {
     const websiteUrl = environment.getInput("Website Url");
-    console.log(websiteUrl);
+
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
     });
-    await waitFor(3000);
-    browser.close();
+    environment.log.info("Browser started successfully");
+    environment.setBrowser(browser);
+    const page = await browser.newPage();
+    await page.goto(websiteUrl);
+    environment.setPage(page);
+    environment.log.info("Opened page at:" + websiteUrl);
     return true;
   } catch (err: any) {
-    console.error(err);
+    environment.log.error(err.message);
     return false;
   }
 };

@@ -4,12 +4,12 @@ export const PAGETOHTMLExecutor = async (
   environment: ExecutionEnvironment<typeof PageToHtmlTask>
 ): Promise<boolean> => {
   try {
-    const websiteUrl = environment.getBrowser();
-    console.log(websiteUrl);
+    const html = await environment.getPage()!.content();
+    environment.setOutput("Html", html);
 
     return true;
   } catch (err: any) {
-    console.error(err);
+    environment.log.error(err.message);
     return false;
   }
 };

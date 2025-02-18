@@ -9,7 +9,6 @@ import {
   WorkflowExecutionStatus,
   WorkflowExecutionTrigger,
 } from "@/types/workflow";
-import { redirect, RedirectType } from "next/navigation";
 import { ExecuteWorkflow } from "./executeWorkflow";
 
 export default async function RunWorkflow(form: {
@@ -47,13 +46,14 @@ export default async function RunWorkflow(form: {
     throw new Error("Execution plan not found");
   }
   executionPlan = result.executionPlan;
+
   const execution = await prisma.workflowExecution.create({
     data: {
       userId,
       workflowId,
       status: WorkflowExecutionStatus.PENDING,
       trigger: WorkflowExecutionTrigger.MANUAL,
-      startAt: new Date(),
+      definition: flowDefinition,
       phases: {
         create: executionPlan.flatMap((phase) =>
           phase.nodes.flatMap((node) => {
