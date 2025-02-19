@@ -59,7 +59,7 @@ export default async function RunWorkflow(form: {
           phase.nodes.flatMap((node) => {
             return {
               userId,
-              status: ExecutionPhaseStatus.CREATED,
+              status: ExecutionPhaseStatus.PENDING,
               number: phase.phase,
               node: JSON.stringify(node),
               name: TaskRegistry[node.data.type].label,

@@ -35,13 +35,13 @@ import {
   CalendarIcon,
   CircleDashedIcon,
   CoinsIcon,
-  Loader2,
   Loader2Icon,
   LucideIcon,
   WorkflowIcon,
 } from "lucide-react";
-import { ReactNode, Suspense, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import PhaseStatusBagde from "./PhaseStatusBagde";
+import ReactCountUpWrapper from "@/components/ReactCountWrapper";
 type ExecutionData = Awaited<ReturnType<typeof GetWorkflowExecutionWithPhases>>;
 const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
   const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
@@ -57,11 +57,27 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
     enabled: selectedPhase !== null,
     queryFn: () => GetWorkflowPhasesDetails(selectedPhase!),
   });
+  const isRunning = query.data?.status === WorkflowExecutionStatus.RUNNING;
+
+  useEffect(() => {
+    //while running we auto-select the current running phase in the sidebar
+    const phases = query.data?.phases || [];
+    if (isRunning) {
+      const selectedPhase = phases.toSorted((a, b) =>
+        a.startAt! < b.startAt! ? 1 : -1
+      )[0];
+      setSelectedPhase(selectedPhase.id);
+      return;
+    }
+    const selectedPhase = phases.toSorted((a, b) =>
+      a.completedAt! < b.completedAt! ? 1 : -1
+    )[0];
+    setSelectedPhase(selectedPhase.id);
+  }, [query.data?.phases, isRunning]);
   const duration = DatesToDurationString(
     query.data?.completedAt,
     query.data?.startAt
   );
-  const isRunning = query.data?.status === WorkflowExecutionStatus.RUNNING;
   const creditConsumed = GetPhasesTotalCost(query.data?.phases || []);
   return (
     <div className="flex w-full h-full">
@@ -70,7 +86,14 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
           <ExecutionLabel
             Icon={CircleDashedIcon}
             label="status"
-            value={query.data?.status}
+            value={
+              <div className="font-semibold capitalize flex gap-2 items-center ">
+                <PhaseStatusBagde
+                  status={query.data?.status as ExecutionPhaseStatus}
+                />
+                <span>{query.data?.status}</span>
+              </div>
+            }
           />
           <ExecutionLabel
             Icon={CalendarIcon}
@@ -99,7 +122,7 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
           <ExecutionLabel
             Icon={CircleDashedIcon}
             label="Credits consumed"
-            value={creditConsumed}
+            value={<ReactCountUpWrapper value={creditConsumed} />}
           />
         </div>
         <Separator />
@@ -129,6 +152,7 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
           ))}
         </div>
       </aside>
+
       <div className="flex w-full h-full">
         {isRunning && (
           <div className="flex items-center justify-center h-full w-full flex-col gap-1">
@@ -153,7 +177,7 @@ const ExecutionViewer = ({ initialData }: { initialData: ExecutionData }) => {
                   <CoinsIcon size={18} className="stroke-muted-foreground" />
                   <span>Credits</span>
                 </div>
-                <span>TODO</span>
+                <span>{phaseDetails.data.creditsConsumed}</span>
               </Badge>
               <Badge variant={"outline"} className="space-x-4">
                 <div className="flex items-center gap-1">

@@ -5,6 +5,7 @@ import { ChevronLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SaveBtn from "./SaveBtn";
 import ExecutionBtn from "./ExecutionBtn";
+import NavigationTab from "./NavigationTab";
 interface Props {
   title: string;
   subTitle?: string;
@@ -35,6 +36,7 @@ const Topbar = ({ subTitle, title, workflowId, hideButton = false }: Props) => {
           )}
         </div>
       </div>
+      <NavigationTab workflowId={workflowId} />
       <div className="flex gap-1 justify-end flex-1">
         {!hideButton && (
           <>

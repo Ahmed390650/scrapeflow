@@ -1,4 +1,5 @@
 import prisma from "@/database/prisma";
+import { waitFor } from "@/lib/helper/waitFor";
 import { createLogColletor } from "@/lib/log";
 import { ExecutorRegistry } from "@/lib/workflow/executor/registry";
 import { TaskRegistry } from "@/lib/workflow/task/registry";
@@ -34,26 +35,28 @@ export const ExecuteWorkflow = async (executionId: string) => {
   await initializeWorkflowExecution(executionId, execution.workflowId);
   //initialize Executionphases <status,startAt>
   await initializePhasesStatus(execution);
-  let creditConsumer = 0;
+  let creditsConsumed = 0;
   let executionFailed = false;
   for (const phase of execution.phases) {
     //execute phase
     const phaseExecution = await executeWorkflowPhase(
       phase,
       environment,
-      edges
+      edges,
+      execution.userId
     );
     if (!phaseExecution.success) {
       executionFailed = true;
       break;
     }
+    creditsConsumed += phaseExecution.creditsConsumed;
   }
   //finalize workflowExecution <status,CompoleteAt> & workflow lastRun<Status>
   await finialWorkflowExecution(
     executionId,
     execution.workflowId,
     executionFailed,
-    creditConsumer
+    creditsConsumed
   );
   // clear up enironment
   cleanUpEnvironment(environment);
@@ -99,7 +102,7 @@ const finialWorkflowExecution = async (
   executionId: string,
   workflowId: string,
   executionFaild: boolean,
-  creditConsumer: number
+  creditsConsumed: number
 ) => {
   const finalStatus = executionFaild
     ? WorkflowExecutionStatus.FAILED
@@ -111,7 +114,7 @@ const finialWorkflowExecution = async (
     },
     data: {
       status: finalStatus,
-      creditsConsumed: creditConsumer,
+      creditsConsumed,
       completedAt: new Date(),
     },
   });
@@ -132,7 +135,8 @@ const finialWorkflowExecution = async (
 const executeWorkflowPhase = async (
   phase: ExecutionPhase,
   environment: Environment,
-  edges: Edge[]
+  edges: Edge[],
+  userId: string
 ) => {
   const LogCollector = createLogColletor();
   const startAt = new Date();
@@ -156,12 +160,15 @@ const executeWorkflowPhase = async (
     `Executing phase ${phase.name} with ${creditRequired} credits required`
   );
   //TODO :decrement user balance (with required credit)
-
-  const success = await executePhase(phase, node, environment, LogCollector);
+  let success = await descrementCredits(creditRequired, userId, LogCollector);
+  const creditsConsumed = success ? creditRequired : 0;
+  if (success) {
+    success = await executePhase(phase, node, environment, LogCollector);
+  }
   //finical executionPhase compoleteAt status
   const outputs = environment.phases[node.id].outputs;
-  await finialPhase(phase.id, success, outputs, LogCollector);
-  return { success };
+  await finialPhase(phase.id, success, outputs, LogCollector, creditsConsumed);
+  return { success, creditsConsumed };
 };
 
 const executePhase = async (
@@ -174,6 +181,7 @@ const executePhase = async (
   if (!runFn) {
     return false;
   }
+  await waitFor(3000);
   const executionEnvironment = createExecutionEnvironment(
     node,
     environment,
@@ -185,7 +193,8 @@ const finialPhase = async (
   phaseId: string,
   success: boolean,
   outputs: any,
-  logCollerctor: LogCollector
+  logCollerctor: LogCollector,
+  creditsConsumed: number
 ) => {
   const finalStatus = success
     ? ExecutionPhaseStatus.COMPLETED
@@ -198,6 +207,7 @@ const finialPhase = async (
       status: finalStatus,
       completedAt: new Date(),
       outputs: JSON.stringify(outputs),
+      creditsConsumed,
       logs: {
         createMany: {
           data: logCollerctor.getAll().map((log) => ({
@@ -261,5 +271,30 @@ const cleanUpEnvironment = (environment: Environment) => {
     environment.browser?.close().catch((err) => {
       console.error("cannot close the browser,reason", err);
     });
+  }
+};
+const descrementCredits = async (
+  amount: number,
+  userId: string,
+  logCollector: LogCollector
+) => {
+  try {
+    await prisma.userBalance.update({
+      where: {
+        userId,
+        credits: {
+          gte: amount,
+        },
+      },
+      data: {
+        credits: {
+          decrement: amount,
+        },
+      },
+    });
+    return true;
+  } catch (error) {
+    logCollector.error("insufficient balance");
+    return false;
   }
 };
