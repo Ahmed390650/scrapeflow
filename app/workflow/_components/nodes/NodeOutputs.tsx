@@ -12,15 +12,17 @@ export const NodeOutput = ({ output }: { output: taskParam }) => {
   return (
     <div className="flex justify-end relative p-3 bg-secondary">
       <p className="text-xs text-muted-foreground">{output.name}</p>
-      <Handle
-        type="source"
-        id={output.name}
-        position={Position.Right}
-        className={cn(
-          "!bg-muted !border-2 !border-background !-right-2 !w-4 !h-4",
-          ColorForHandler[output.type]
-        )}
-      />
+      {!output.hideHandle && (
+        <Handle
+          type="source"
+          id={output.name}
+          position={Position.Right}
+          className={cn(
+            "!bg-muted !border-2 !border-background !-right-2 !w-4 !h-4",
+            ColorForHandler[output.type]
+          )}
+        />
+      )}
     </div>
   );
 };

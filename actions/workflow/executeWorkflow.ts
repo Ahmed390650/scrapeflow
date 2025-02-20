@@ -16,7 +16,10 @@ import { Edge } from "@xyflow/react";
 import { Browser, Page } from "puppeteer";
 import "server-only";
 
-export const ExecuteWorkflow = async (executionId: string) => {
+export const ExecuteWorkflow = async (
+  executionId: string,
+  NextRuntAt?: Date
+) => {
   const execution = await prisma.workflowExecution.findUnique({
     where: {
       id: executionId,
@@ -32,7 +35,11 @@ export const ExecuteWorkflow = async (executionId: string) => {
   const edges = JSON.parse(execution.definition).edges as Edge[];
   const environment: Environment = { phases: {} };
   //initialize workflowExecution status and startAt & workflow lastRun<status,id,At>
-  await initializeWorkflowExecution(executionId, execution.workflowId);
+  await initializeWorkflowExecution(
+    executionId,
+    execution.workflowId,
+    NextRuntAt
+  );
   //initialize Executionphases <status,startAt>
   await initializePhasesStatus(execution);
   let creditsConsumed = 0;
@@ -64,7 +71,8 @@ export const ExecuteWorkflow = async (executionId: string) => {
 };
 const initializeWorkflowExecution = async (
   executionId: string,
-  workflowId: string
+  workflowId: string,
+  NextRuntAt?: Date
 ) => {
   await prisma.workflowExecution.update({
     where: {
@@ -83,6 +91,7 @@ const initializeWorkflowExecution = async (
       lastRunAt: new Date(),
       lastRunId: executionId,
       lastRunStatus: WorkflowExecutionStatus.RUNNING,
+      ...(NextRuntAt && { NextRuntAt }),
     },
   });
 };
@@ -156,9 +165,6 @@ const executeWorkflowPhase = async (
     },
   });
   const creditRequired = TaskRegistry[node.data.type].credits;
-  console.log(
-    `Executing phase ${phase.name} with ${creditRequired} credits required`
-  );
   //TODO :decrement user balance (with required credit)
   let success = await descrementCredits(creditRequired, userId, LogCollector);
   const creditsConsumed = success ? creditRequired : 0;
@@ -179,6 +185,7 @@ const executePhase = async (
 ): Promise<boolean> => {
   const runFn = ExecutorRegistry[node.data.type];
   if (!runFn) {
+    logCollector.error(`Executor of type ${node.data.type} not found`);
     return false;
   }
   await waitFor(3000);

@@ -11,11 +11,18 @@ model Workflow{
   userId String 
   name   String
   description String?
+
   definition String
+  executionPlan String?
+  creditsCost Int @default(0)
   status String
-  lastRunId String?
+  
+  cron String?
+
+  lastRunId String? 
   lastRunStatus String?
   lastRunAt DateTime?
+  NextRuntAt DateTime?
 
   executions WorkflowExecution[]
   createdAt DateTime @default(now())

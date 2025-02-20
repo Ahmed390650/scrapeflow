@@ -35,7 +35,7 @@ const NodeCard = ({
         });
       }}
       className={cn(
-        "rounded-md cursor-pointer bg-background border-2 border-separate w-[420px] flex flex-col gap-1 text-xs",
+        "rounded-md cursor-pointer bg-secondary border-2 border-separate w-[420px] flex flex-col gap-1 text-xs",
         isSelected && "border-primary",
         hasInvalidInputs && "border-destructive border-2"
       )}>

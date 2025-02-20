@@ -11,6 +11,7 @@ interface Props {
   side?: "top" | "right" | "bottom" | "left";
 }
 const TooltipWrapper = ({ children, content, side }: Props) => {
+  if (!content) return children;
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>

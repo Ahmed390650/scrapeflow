@@ -14,7 +14,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import UserAvaibleCredits from "./UserAvaibleCredits";
 const routes = [
-  { label: "Home", href: "", icon: HomeIcon },
+  { label: "Home", href: "/", icon: HomeIcon },
   {
     label: "Workflows",
     href: "workflows",
@@ -35,7 +35,7 @@ const DesktopSidebar = () => {
   const pathname = usePathname();
   const activeRoute =
     routes.find(
-      (route) => route.href.length > 0 && pathname.includes(route.href)
+      (route) => route.href.length > 1 && pathname.includes(route.href)
     ) || routes[0];
   return (
     <div className="hidden relative md:block min-w-[280px] max-w-[280px] h-screen overflow-hidden w-full bg-primary/5 dark:bg-secondary/30 dark:text-foreground text-muted-foreground border-r-2 border-separate">
@@ -45,7 +45,7 @@ const DesktopSidebar = () => {
       <div className="p-2">
         <UserAvaibleCredits />
       </div>
-      <div className="flex flex-col p-2 ">
+      <div className="flex flex-col p-2 gap-1">
         {routes.map((route) => (
           <Link
             href={route.href}
@@ -69,7 +69,7 @@ export const MobileSidebar = () => {
   const [open, setOpen] = React.useState(false);
   const activeRoute =
     routes.find(
-      (route) => route.href.length > 0 && pathname.includes(route.href)
+      (route) => route.href.length > 1 && pathname.includes(route.href)
     ) || routes[0];
   return (
     <div className="block border-separate bg-background md:hidden p-2">

@@ -12,7 +12,6 @@ export const ExtractTextFromElementExecutor = async (
     }
     const selector = environment.getInput("Selector");
     if (!selector) {
-      console.log("no selector found");
       environment.log.error("no selector found!");
       return false;
     }

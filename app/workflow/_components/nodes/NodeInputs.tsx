@@ -32,16 +32,18 @@ export const NodeInput = ({
         hasError && "bg-destructive/30"
       )}>
       <NodeParamField input={input} nodeId={nodeId} disabled={isConnected} />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id={input.name}
-        isConnectable={!isConnected}
-        className={cn(
-          "!bg-muted-foreground !border-2 !border-background !-left-2 !w-4 !h-4",
-          ColorForHandler[input.type]
-        )}
-      />
+      {!input.hideHandle && (
+        <Handle
+          type="target"
+          position={Position.Left}
+          id={input.name}
+          isConnectable={!isConnected}
+          className={cn(
+            "!bg-muted-foreground !border-2 !border-background !-left-2 !w-4 !h-4",
+            ColorForHandler[input.type]
+          )}
+        />
+      )}
     </div>
   );
 };
