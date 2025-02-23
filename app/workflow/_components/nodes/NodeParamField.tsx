@@ -1,5 +1,4 @@
 "use client";
-import { Input } from "@/components/ui/input";
 import { taskParam, TaskParamType } from "@/types/task";
 import React, { useCallback } from "react";
 import StringParam from "./param/StringParam";
@@ -7,6 +6,7 @@ import { useReactFlow } from "@xyflow/react";
 import { AppNode } from "@/types/workflow";
 import BrowserInstanceParam from "./param/BrowserInstanceParam";
 import SelectParam from "./param/SelectParam";
+import CredentialSelectParam from "./param/CredentialSelectParam";
 
 const NodeParamField = ({
   input,
@@ -25,7 +25,7 @@ const NodeParamField = ({
       updateNodeData(nodeId, {
         inputs: {
           ...node.data.inputs,
-          [input.name]: newValue,
+          [input.name]: newValue.trim(),
         },
       });
     },
@@ -52,6 +52,15 @@ const NodeParamField = ({
     case TaskParamType.SELECT:
       return (
         <SelectParam
+          params={input}
+          disabled={disabled}
+          value={value}
+          updateNodeParamValue={updateNodeParamValue}
+        />
+      );
+    case TaskParamType.CREDENTIAL:
+      return (
+        <CredentialSelectParam
           params={input}
           disabled={disabled}
           value={value}

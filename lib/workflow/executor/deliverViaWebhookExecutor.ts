@@ -25,9 +25,10 @@ export const DeliverViaWebhookExecutor = async (
     const statusCode = await response.status;
     if (statusCode !== 200) {
       environment.log.error(`status code ${statusCode}`);
+      return false;
     }
     const responseBody = await response.json();
-    environment.log.info(JSON.stringify(responseBody));
+    environment.log.info(JSON.stringify(responseBody, null, 4));
     return true;
   } catch (err: any) {
     environment.log.error(err.message);

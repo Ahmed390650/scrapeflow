@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 const NavigationTab = ({ workflowId }: { workflowId: string }) => {
   const pathName = usePathname();
-  const activeValue = pathName.split("/")[2];
+
+  const activeValue =
+    pathName.split("/").length === 4 ? pathName.split("/")[2] : undefined;
   return (
     <Tabs value={activeValue} className="w-[400px]">
       <TabsList className="grid grid-cols-2 w-full ">

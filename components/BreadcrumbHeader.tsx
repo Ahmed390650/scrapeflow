@@ -1,7 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { Breadcrumb, BreadcrumbLink, BreadcrumbList } from "./ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+  BreadcrumbItem,
+} from "./ui/breadcrumb";
 import { MobileSidebar } from "./Sidebar";
 
 const BreadcrumbHeader = () => {
@@ -14,9 +20,12 @@ const BreadcrumbHeader = () => {
         <BreadcrumbList>
           {paths.map((path, index) => (
             <React.Fragment key={index}>
-              <BreadcrumbLink className="capitalize" href={`/${path}`}>
-                {path === "" ? "Home" : path}
-              </BreadcrumbLink>
+              <BreadcrumbItem>
+                <BreadcrumbLink className="capitalize" href={`/${path}`}>
+                  {path === "" ? "Home" : path}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              {index !== paths.length - 1 && <BreadcrumbSeparator />}
             </React.Fragment>
           ))}
         </BreadcrumbList>

@@ -1,7 +1,7 @@
-import { waitFor } from "@/lib/helper/waitFor";
-import { Environment, ExecutionEnvironment } from "@/types/execution";
+import { ExecutionEnvironment } from "@/types/execution";
 import puppeteer from "puppeteer";
 import { LaunchBrowserTask } from "../task/LaunchBrowserTask";
+
 export const LauncherBrowserExecutor = async (
   environment: ExecutionEnvironment<typeof LaunchBrowserTask>
 ): Promise<boolean> => {
@@ -14,6 +14,7 @@ export const LauncherBrowserExecutor = async (
     environment.log.info("Browser started successfully");
     environment.setBrowser(browser);
     const page = await browser.newPage();
+
     await page.goto(websiteUrl);
     environment.setPage(page);
     environment.log.info("Opened page at:" + websiteUrl);
